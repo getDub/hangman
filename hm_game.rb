@@ -6,9 +6,8 @@ class Game
 
   def initialize
     @dictionary = dictionary
-    @secret_word = secret_word
-    @guesses_left = guesses_left
-    @letters_chosen = ["none"]
+    @secret_word= secret_word
+    @incorrect_guesses = []
     @correct_guesses = []
   end
 
@@ -16,14 +15,12 @@ class Game
     load_dictionary
     puts "Hi Player, welcome to Hangman."
     puts "Try and guess the secret word below one letter at a time.\n\n"
-    letter_spaces(@secret_word = valid_word_size.sample(1).first)
-    puts "You have #{turns_left} guesses left"
+    display_word(@secret_word = valid_word_size.sample(1).first.upcase)
+    puts "You have #{MAX_ATTEMPTS} guesses left"
     p @secret_word
-      turns_left.times do
-        # p @letters_chosen
-        puts "choose a letter"
-        # p @letters_chosen
-        correct_letter?(letter = gets.chomp)
+      MAX_ATTEMPTS.times do
+        puts "\nchoose a letter"
+        correct_letter?(letter_guessed)
       end
   end
 
@@ -38,7 +35,7 @@ class Game
     end
   end
 
-  def letter_spaces(word)
+  def display_word(word)
     no_of_spaces = word.size
     no_of_spaces.times do
       print " _"
@@ -46,44 +43,19 @@ class Game
     print "\n\n"
   end
 
-  def display_word
-    @secret_word
+  def letter_guessed
+    guess = gets.chomp.upcase
+    @correct_guesses << guess unless @secret_word.include?(guess)
+    puts "You have guessed these letters - #{@correct_guesses.join(", ")}"    
+    guess
   end
-
-  def turns_left
-     @guesses_left = @secret_word.size
-  end
-
-  # def letter_correct?(letter)
-  #   if @secret_word.include?(letter)
-  #     puts " #{letter}"
-  #   else
-  #     puts " _"
-  #   end
-  # end
-
-  # def correct_letter?(letter)
-  #   @secret_word.split("").map do |character|
-  #     if letter == character
-  #       print " #{character}"
-  #       # print character
-  #     elsif letter != character
-  #       print character = " _"
-  #     end
-  #   end
-  # end
 
   def correct_letter?(letter)
     puts @secret_word.chars.map {|character| letter.include?(character) ? character : "_"}.join(" ")
   end
-  # def correct_letter?(letter)
-  #   @secret_word.split("").map do |character|
-  #     print character = "_ " unless letter == character
-  #     # @correct_guesses << character
-  #     print character
-  #   end
-  # end
 
+  
+  
 end
 
 hm = Game.new
