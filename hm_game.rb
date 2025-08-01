@@ -8,7 +8,7 @@ class Game
     @dictionary = dictionary
     @secret_word= secret_word
     @incorrect_guesses = []
-    @correct_guesses = []
+    @letters_guessed = []
   end
 
   def start_game
@@ -20,7 +20,7 @@ class Game
     p @secret_word
       MAX_ATTEMPTS.times do
         puts "\nchoose a letter"
-        correct_letter?(letter_guessed)
+        correct_letter?(guesses)
       end
   end
 
@@ -43,14 +43,18 @@ class Game
     print "\n\n"
   end
 
-  def letter_guessed
+  def guesses
     guess = gets.chomp.upcase
-    @correct_guesses << guess unless @secret_word.include?(guess)
-    puts "You have guessed these letters - #{@correct_guesses.join(", ")}"    
-    guess
+    p "guess looks like this: #{guess.class}"
+    @letters_guessed << guess #unless @secret_word.include?(guess)
+    puts "You have guessed these letters - #{@letters_guessed.join(", ")}"    
+    # guess
+    p "letter guessed looks like this: #{@letters_guessed.class}"
+    @letters_guessed
   end
 
   def correct_letter?(letter)
+    p "letters entering correct letter : #{letter}"
     puts @secret_word.chars.map {|character| letter.include?(character) ? character : "_"}.join(" ")
   end
 
