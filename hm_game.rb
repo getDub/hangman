@@ -2,26 +2,34 @@ class Game
 
   attr_accessor :dictionary, :secret_word, :guesses_left, :letters_chosen
 
-  MAX_ATTEMPTS = 7 
-
+  
   def initialize
     @dictionary = dictionary
     @secret_word= secret_word
-    @incorrect_guesses = []
+    @attempts = 7
     @letters_guessed = []
   end
 
   def start_game
     load_dictionary
     puts "Hi Player, welcome to Hangman."
-    puts "Try and guess the secret word below one letter at a time.\n\n"
+    puts "Try and guess the secret word below one letter at a time."
+    puts "If you think you know the word you can type it in."
+    puts "However, if it is incorrect it will be counted as an attempt.\n\n"
+    puts "Take your first guess\n"
     display_word(@secret_word = valid_word_size.sample(1).first.upcase)
-    puts "You have #{MAX_ATTEMPTS} guesses left"
     p @secret_word
-      MAX_ATTEMPTS.times do
-        puts "\nchoose a letter"
-        correct_letter?(guesses)
+    while @attempts > 0
+      if @attempts < 7
+        puts "\nGuesses remaining = #{@attempts}"
+        puts "Letters guessed =  #{@letters_guessed.join(", ")}"
+        puts "Guess again"
       end
+      correct_letter?(guesses)
+      @attempts -= 1
+    end
+    puts "\nYou loose."
+    puts "The secret word was...#{@secret_word}"
   end
 
   def load_dictionary
@@ -45,20 +53,26 @@ class Game
 
   def guesses
     guess = gets.chomp.upcase
-    p "guess looks like this: #{guess.class}"
-    @letters_guessed << guess #unless @secret_word.include?(guess)
-    puts "You have guessed these letters - #{@letters_guessed.join(", ")}"    
-    # guess
-    p "letter guessed looks like this: #{@letters_guessed.class}"
+    win?(guess) if guess.length > 1 
+    @letters_guessed << guess 
     @letters_guessed
   end
 
   def correct_letter?(letter)
-    p "letters entering correct letter : #{letter}"
+    puts "\n"
     puts @secret_word.chars.map {|character| letter.include?(character) ? character : "_"}.join(" ")
   end
 
-  
+  def win?(word)
+    if word.eql?(@secret_word)
+      @attempts = 0
+      puts "You win"
+      @letters_guessed = word.split("")
+    else
+      puts "\nIncorrect word\n"
+    end
+    word
+  end
   
 end
 
