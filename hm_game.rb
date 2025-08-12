@@ -1,13 +1,15 @@
 class Game
 
-  attr_accessor :dictionary, :secret_word, :guesses_left, :letters_chosen
+  attr_accessor :dictionary, :secret_word, :correct, :incorrect
 
   
   def initialize
     @dictionary = dictionary
-    @secret_word= secret_word
+    @secret_word = secret_word
     @attempts = 7
     @letters_guessed = []
+    @correct = []
+    @incorrect = []
   end
 
   def start_game
@@ -19,16 +21,12 @@ class Game
     puts "Take your first guess\n"
     display_word(@secret_word = valid_word_size.sample(1).first.upcase)
     p @secret_word
-    while @attempts > 0
-      if @attempts < 7
-        puts "\nGuesses remaining = #{@attempts}"
-        puts "Letters guessed =  #{@letters_guessed.join(", ")}"
-        puts "Guess again"
-      end
-      correct_letter?(guesses)
+    while @attempts > 0 
       @attempts -= 1
+      game_display(guess)
+      # all_letters_revealed
     end
-    puts "\nYou loose."
+    puts "\nYour out of turns. You loose." if @attempts == 0
     puts "The secret word was...#{@secret_word}"
   end
 
@@ -38,9 +36,19 @@ class Game
   end
 
   def valid_word_size
-    @dictionary.select do |word|
+    dictionary.select do |word|
       word.size >= 5 && word.size <= 12
     end
+  end
+
+  def game_display(letter)
+    puts @attempts > 0 ? "\nGuesses remaining = #{@attempts}" : "Guesses remaining = 0"
+    # puts remaining_guesses
+    # puts "\nGuesses remaining = #{@attempts}"
+    puts "Incorrect letters = #{@incorrect.join(", ")}"
+    puts "Correct letters = #{@correct.join(", ")}"
+    puts "\n"
+    puts secret_word.chars.map {|character| correct.include?(character) ? character : "_"}.join(" ")
   end
 
   def display_word(word)
@@ -51,29 +59,43 @@ class Game
     print "\n\n"
   end
 
-  def guesses
+  def guess
     guess = gets.chomp.upcase
-    win?(guess) if guess.length > 1 
-    @letters_guessed << guess 
-    @letters_guessed
-  end
-
-  def correct_letter?(letter)
-    puts "\n"
-    puts @secret_word.chars.map {|character| letter.include?(character) ? character : "_"}.join(" ")
-  end
-
-  def win?(word)
-    if word.eql?(@secret_word)
-      @attempts = 0
-      puts "You win"
-      @letters_guessed = word.split("")
+    # winning_guess?(guess) if guess.length > 1 
+    if guess.length > 1
+      winning_guess?(guess)
+    elsif
+      @secret_word.include?(guess)
+      @correct << guess
+    # if @secret_word.include?(guess)
+      # @correct << guess 
     else
-      puts "\nIncorrect word\n"
+      @incorrect << guess
     end
-    word
   end
+
+   def winning_guess?(word)
+    if word.eql?(@secret_word)
+      @attempts = -1
+      puts "\nYOU WIN"
+      @correct = word#.split("")
+      puts "correct is#{@correct}"
+    # elsif word.eql?(true)
+    #   @attempts = -1
+    #   puts "Solved! The secrect word is #{@secret_word}"
+    else
+      puts "\nIncorrect word"
+      @incorrect << word#.split("")
+    end
+  end
+
+  def all_letters_revealed
+     puts "Solved! The secrect word is #{@secret_word}" if @secret_word.chars.all? {|character| @correct.include?(character)}
+    @attempts = -1
+  end
+
   
+    
 end
 
 hm = Game.new
