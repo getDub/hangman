@@ -22,6 +22,8 @@ class Game
     p @secret_word
     while @attempts > 0 
       game_info(guess)
+      all_letters_revealed ? winner : press1
+      puts "__________________________________"
     end
     puts "\nYour out of turns. You loose." if @attempts == 0
   end
@@ -55,20 +57,27 @@ class Game
 
   def guess
     guess = gets.chomp.upcase
+
+    if guess == "1"
+      save_game
+    end
+    
     puts "you've guessed this already" if guessed_already(guess)
     if guess.length > 1
-      winning_guess?(guess)
+      word_guess(guess)
     elsif @secret_word.include?(guess)
+      puts "#{guess} is correct"
       @correct << guess
     else
       @attempts -= 1 
+      puts "#{guess} is incorrect"
       @incorrect << guess
     end
 
-    if all_letters_revealed
-      puts "Solved! The secrect word is #{@secret_word}"
-      @attempts = -1 
-    end
+    # if all_letters_revealed
+    #   puts "Solved! The secrect word is #{@secret_word}"
+    #   @attempts = -1 
+    # end
   end
 
   def guessed_already(players_guess)
@@ -76,19 +85,38 @@ class Game
   end
 
    
-  def winning_guess?(word)
+  def word_guess(word)
     if word.eql?(@secret_word)
-      @attempts = -1
-      puts "\nYOU WIN"
       @correct = word.split("")
     else
-      puts "\nIncorrect word"
+      puts "\n #{word} is the incorrect word unfortunately"
+      @attempts -= 1
       @incorrect << word
     end
   end
 
   def all_letters_revealed
      @secret_word.chars.all? {|character| @correct.include?(character)}
+  end
+
+  def winner
+    @attempts = -1
+    puts "Congrats...YOU win!"
+  end
+
+  def press1
+    puts "Press 1 to Save Game"
+  end
+
+  def save_game
+    # puts "Save game? [Y]es"
+    # choice = gets.chomp.upcase
+    # if choice == "Y"
+      puts "yaml stuff"
+    # elsif choice == "n"
+      # puts "well game on then :-)"
+      # return
+    # end
   end
 
 end
