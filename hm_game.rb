@@ -1,3 +1,5 @@
+require "yaml"
+
 class Game
 
   attr_accessor :dictionary, :secret_word, :correct, :incorrect
@@ -59,10 +61,13 @@ class Game
     guess = gets.chomp.upcase
 
     if guess == "1"
-      save_game
+      puts "Save as?"
+      file_name = gets.chomp
+      save_game(file_name)
     end
     
     puts "you've guessed this already" if guessed_already(guess)
+
     if guess.length > 1
       word_guess(guess)
     elsif @secret_word.include?(guess)
@@ -73,11 +78,6 @@ class Game
       puts "#{guess} is incorrect"
       @incorrect << guess
     end
-
-    # if all_letters_revealed
-    #   puts "Solved! The secrect word is #{@secret_word}"
-    #   @attempts = -1 
-    # end
   end
 
   def guessed_already(players_guess)
@@ -108,15 +108,14 @@ class Game
     puts "Press 1 to Save Game"
   end
 
-  def save_game
-    # puts "Save game? [Y]es"
-    # choice = gets.chomp.upcase
-    # if choice == "Y"
-      puts "yaml stuff"
-    # elsif choice == "n"
-      # puts "well game on then :-)"
-      # return
-    # end
+  def save_game(file_name)
+    puts file_name
+    Dir.mkdir("saves") unless Dir.exist?("saves")
+    puts File.exist?('file_name')
+    yaml =  YAML::dump(self)
+    puts yaml
+    game_file = File.open('/saves/file_name.yaml', 'w')
+    game_file.write(yaml)
   end
 
 end
