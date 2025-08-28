@@ -8,7 +8,6 @@ class Game
     @dictionary = dictionary
     @secret_word = secret_word
     @attempts = 7
-    @letters_guessed = []
     @correct = []
     @incorrect = []
   end
@@ -112,10 +111,8 @@ class Game
     puts file_name
     Dir.mkdir("saves") unless Dir.exist?("saves")
     puts File.exist?('file_name')
-    yaml =  YAML::dump(self)
-    puts yaml
-    game_file = File.open('/saves/file_name.yaml', 'w')
-    game_file.write(yaml)
+    current_game_data =  YAML::dump(self)
+    File.open("saves/#{file_name}.yaml", "w") {|f| f.write(current_game_data)}
   end
 
 end
