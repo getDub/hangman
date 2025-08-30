@@ -7,7 +7,7 @@ class Game
   def initialize
     @dictionary = dictionary
     @secret_word = secret_word
-    @attempts = 7
+    @attempts_left = 7
     @correct = []
     @incorrect = []
   end
@@ -21,12 +21,12 @@ class Game
     puts "Take your first guess\n"
     display_word(@secret_word = valid_word_size.sample(1).first.upcase)
     p @secret_word
-    while @attempts > 0 
+    while @attempts_left > 0 
       game_info(guess)
       all_letters_revealed ? winner : press1
       puts "__________________________________"
     end
-    puts "\nYour out of turns. You loose." if @attempts == 0
+    puts "\nYour out of turns. You loose." if @attempts_left == 0
   end
 
   def load_dictionary
@@ -43,7 +43,7 @@ class Game
   def game_info(player_input)
     puts "\n"
     puts secret_word.chars.map {|character| correct.include?(character) ? character : "_"}.join(" ")
-    puts @attempts > 0 ? "Guesses remaining = #{@attempts}" : "Guesses remaining = 0"
+    puts @attempts_left > 0 ? "Guesses remaining = #{@attempts_left}" : "Guesses remaining = 0"
     puts "Incorrect letters = #{@incorrect.join(", ")}"
     puts "Correct letters = #{@correct.join(", ")}"
     puts "\n"
@@ -63,6 +63,8 @@ class Game
       puts "Save as?"
       file_name = gets.chomp
       save_game(file_name)
+    elsif guess == "2"
+      list_saved_games
     end
     
     puts "you've guessed this already" if guessed_already(guess)
@@ -73,7 +75,7 @@ class Game
       puts "#{guess} is correct"
       @correct << guess
     else
-      @attempts -= 1 
+      @attempts_left -= 1 
       puts "#{guess} is incorrect"
       @incorrect << guess
     end
@@ -89,7 +91,7 @@ class Game
       @correct = word.split("")
     else
       puts "\n #{word} is the incorrect word unfortunately"
-      @attempts -= 1
+      @attempts_left -= 1
       @incorrect << word
     end
   end
@@ -99,7 +101,7 @@ class Game
   end
 
   def winner
-    @attempts = -1
+    @attempts_left = -1
     puts "Congrats...YOU win!"
   end
 
@@ -107,12 +109,20 @@ class Game
     puts "Press 1 to Save Game"
   end
 
+  def list_saved_games
+    Dir.entries("saves").each_with_index {|f, i| puts "#{i + 1}. #{f}"}
+  end
+  
   def save_game(file_name)
-    puts file_name
     Dir.mkdir("saves") unless Dir.exist?("saves")
-    puts File.exist?('file_name')
+    puts "file already exists" if File.exist?('file_name')
     current_game_data =  YAML::dump(self)
     File.open("saves/#{file_name}.yaml", "w") {|f| f.write(current_game_data)}
+  end
+ 
+  def load_game(file_name)
+    game_file = YAML::load(file_name)
+    game.new(game_file)
   end
 
 end
