@@ -2,7 +2,7 @@ require "yaml"
 
 class Game
 
-  attr_accessor :dictionary, :secret_word, :correct, :incorrect
+  attr_accessor :dictionary, :secret_word, :attempts_left, :correct, :incorrect
   
   def initialize
     @dictionary = dictionary
@@ -64,7 +64,10 @@ class Game
       file_name = gets.chomp
       save_game(file_name)
     elsif guess == "2"
-      list_saved_games
+      # game = Game.new().load_game(saved_game)
+      # new_game = Game.new()
+      # new_game.load_game(saved_game)
+      
     end
     
     puts "you've guessed this already" if guessed_already(guess)
@@ -109,23 +112,38 @@ class Game
     puts "Press 1 to Save Game"
   end
 
-  def list_saved_games
-    Dir.entries("saves").each_with_index {|f, i| puts "#{i + 1}. #{f}"}
+  def saved_game
+    games = Dir.children("saves").each_with_index {|f, i| puts "#{i + 1}. #{f}"}
+    puts "type the number of the game file you would like to load."
+    file_number = gets.chomp.to_i #+ 1
+    puts games[file_number] 
+    games[file_number] 
   end
   
   def save_game(file_name)
     Dir.mkdir("saves") unless Dir.exist?("saves")
     puts "file already exists" if File.exist?('file_name')
-    current_game_data =  YAML::dump(self)
+    current_game_data = YAML::dump(self)
+    # p current_game_data
     File.open("saves/#{file_name}.yaml", "w") {|f| f.write(current_game_data)}
+    puts "Thank you. '#{file_name}' has been saved"
   end
  
-  def load_game(file_name)
-    game_file = YAML::load(file_name)
-    game.new(game_file)
+  def self.load_game(saved_game_file)
+    puts "Game file received in load game: #{saved_game_file}"
+    # YAML.load_file("saves/#{saved_game_file}", permitted_classes: [Game])
+    game_file = File.new("saves/#{saved_game_file}")
+    yaml = game_file.read
+    loaded_data = YAML::load(yaml, permitted_classes: [Game])
+    puts loaded_data
+    # Game.new(loaded_data)
   end
 
 end
 
-hm = Game.new
-hm.start_game
+# hm = Game.new
+# hm.start_game
+# start_game
+# 
+new_game = Game.new()
+new_game.load_game(saved_game)
