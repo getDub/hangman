@@ -63,10 +63,8 @@ class Game
       puts "Save as?"
       file_name = gets.chomp
       save_game(file_name)
-    elsif guess == "2"
-      # game = Game.new().load_game(saved_game)
-      # new_game = Game.new()
-      # new_game.load_game(saved_game)
+    # elsif guess == "2"
+      # load_game(saved_game)
       
     end
     
@@ -112,13 +110,13 @@ class Game
     puts "Press 1 to Save Game"
   end
 
-  def saved_game
-    games = Dir.children("saves").each_with_index {|f, i| puts "#{i + 1}. #{f}"}
-    puts "type the number of the game file you would like to load."
-    file_number = gets.chomp.to_i #+ 1
-    puts games[file_number] 
-    games[file_number] 
-  end
+  # def saved_game
+  #   games = Dir.children("saves").each_with_index {|f, i| puts "#{i + 1}. #{f}"}
+  #   puts "type the number of the game file you would like to load."
+  #   file_number = gets.chomp.to_i #+ 1
+  #   puts games[file_number] 
+  #   games[file_number] 
+  # end
   
   def save_game(file_name)
     Dir.mkdir("saves") unless Dir.exist?("saves")
@@ -130,12 +128,11 @@ class Game
   end
  
   def self.load_game(saved_game_file)
-    puts "Game file received in load game: #{saved_game_file}"
+    # puts "Game file received in load game: #{saved_game_file}"
     # YAML.load_file("saves/#{saved_game_file}", permitted_classes: [Game])
     game_file = File.new("saves/#{saved_game_file}")
     yaml = game_file.read
-    loaded_data = YAML::load(yaml, permitted_classes: [Game])
-    puts loaded_data
+    YAML::load(yaml, permitted_classes: [Game])
     # Game.new(loaded_data)
   end
 
@@ -143,7 +140,37 @@ end
 
 # hm = Game.new
 # hm.start_game
-# start_game
-# 
-new_game = Game.new()
-new_game.load_game(saved_game)
+
+
+def load_screen
+  puts "Press [n] to start a new game"
+  puts "Press [l] to load existing game"
+  choice = gets.chomp.downcase
+  # puts choice
+  if choice == "n"
+    print "\n___________________________________________________________\n"
+    start_new_game
+    # file_name = gets.chomp
+  #   save_game(file_name)
+  # elsif guess == "2"
+  #   # load_game(saved_game)
+  end
+end
+
+
+def start_new_game
+  Game.new().start_game
+end
+
+def saved_game
+  games = Dir.children("saves").each_with_index {|f, i| puts "#{i + 1}. #{f}"}
+  puts "type the number of the game file you would like to load."
+  file_number = gets.chomp.to_i #+ 1
+  puts games[file_number] 
+  games[file_number] 
+end
+
+# game = Game.new().load_game(saved_game)
+# file = 'birds.yaml'
+# new_game.load_game(saved_game)
+load_screen
