@@ -21,12 +21,12 @@ class Game
     puts "Take your first guess\n"
     display_word(@secret_word = valid_word_size.sample(1).first.upcase)
     p @secret_word
-    while @attempts_left > 0 
-      game_info(guess)
-      all_letters_revealed ? winner : press1
-      puts "__________________________________"
-    end
-    puts "\nYour out of turns. You loose." if @attempts_left == 0
+    # while @attempts_left > 0 
+    #   game_info(guess)
+    #   all_letters_revealed ? winner : press1
+    #   puts "__________________________________"
+    # end
+    # puts "\nYour out of turns. You loose." if @attempts_left == 0
   end
 
   def load_dictionary
@@ -64,7 +64,7 @@ class Game
       file_name = gets.chomp
       save_game(file_name)
     # elsif guess == "2"
-      # load_game(saved_game)
+      # load_game(saved_games)
       
     end
     
@@ -110,30 +110,18 @@ class Game
     puts "Press 1 to Save Game"
   end
 
-  # def saved_game
-  #   games = Dir.children("saves").each_with_index {|f, i| puts "#{i + 1}. #{f}"}
-  #   puts "type the number of the game file you would like to load."
-  #   file_number = gets.chomp.to_i #+ 1
-  #   puts games[file_number] 
-  #   games[file_number] 
-  # end
-  
   def save_game(file_name)
     Dir.mkdir("saves") unless Dir.exist?("saves")
     puts "file already exists" if File.exist?('file_name')
     current_game_data = YAML::dump(self)
-    # p current_game_data
     File.open("saves/#{file_name}.yaml", "w") {|f| f.write(current_game_data)}
     puts "Thank you. '#{file_name}' has been saved"
   end
  
-  def self.load_game(saved_game_file)
-    # puts "Game file received in load game: #{saved_game_file}"
-    # YAML.load_file("saves/#{saved_game_file}", permitted_classes: [Game])
-    game_file = File.new("saves/#{saved_game_file}")
+  def self.load_game(saved_games_file)
+    game_file = File.open("saves/#{saved_games_file}")
     yaml = game_file.read
     YAML::load(yaml, permitted_classes: [Game])
-    # Game.new(loaded_data)
   end
 
 end
@@ -146,31 +134,40 @@ def load_screen
   puts "Press [n] to start a new game"
   puts "Press [l] to load existing game"
   choice = gets.chomp.downcase
-  # puts choice
   if choice == "n"
     print "\n___________________________________________________________\n"
     start_new_game
-    # file_name = gets.chomp
-  #   save_game(file_name)
-  # elsif guess == "2"
-  #   # load_game(saved_game)
+  elsif choice == "l"
+    play(Game.load_game(saved_games))
   end
 end
 
 
 def start_new_game
   Game.new().start_game
-end
-
-def saved_game
+end  
+  
+def saved_games
   games = Dir.children("saves").each_with_index {|f, i| puts "#{i + 1}. #{f}"}
   puts "type the number of the game file you would like to load."
-  file_number = gets.chomp.to_i #+ 1
-  puts games[file_number] 
-  games[file_number] 
+  file_number = gets.chomp.to_i
+  puts games[file_number - 1] 
+  games[file_number - 1] 
 end
 
-# game = Game.new().load_game(saved_game)
-# file = 'birds.yaml'
-# new_game.load_game(saved_game)
+def play(game)
+  puts "This is the new game and #{game.secret_word} is the secret word."
+  puts "attempts left = #{game.attempts_left}, correct = #{game.correct} incorrect = #{game.incorrect}"
+  # game.display(game.secret_word)
+  # puts game.secret_word.class
+  # puts "Please guess a letter"
+  while game.attempts_left > 0 
+    game.game_info(game.guess)
+    game.all_letters_revealed ? game.winner : game.press1
+    puts "__________________________________"
+  end
+  puts "\nYour out of turns. You loose." if game.attempts_left == 0
+
+end
+
 load_screen
