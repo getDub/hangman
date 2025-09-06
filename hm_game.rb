@@ -45,9 +45,10 @@ class Game
     puts "Try and guess the secret word below one letter at a time."
     puts "If you think you know the word you can type it in."
     puts "However, if it is incorrect it will be counted as an attempt.\n\n"
-    print "Take your first guess\n"
+    print "Take your first guess\n\n"
     choose_secret_word
     display_word
+    spacer
   end
 
   def game_info(player_input)
@@ -68,18 +69,19 @@ class Game
     guess = gets.chomp.upcase
     @all_guesses << guess
 
+    puts "    Your guess needs to be a letter not a number." if guess.to_i > 1
     save_as? if guess == "1"
 
-    puts "you've guessed this already" if guessed_already(guess)
+    puts "    You've guessed this already" if guessed_already(guess)
 
     if guess.length > 1
       word_guess(guess)
     elsif @secret_word.include?(guess)
-      puts "#{guess} is correct"
+      puts "    #{guess} is correct"
       @correct << guess
     else
       @attempts_left -= 1 
-      puts "#{guess} is incorrect"
+      puts "    #{guess} is incorrect"
       @incorrect << guess
     end
   end
@@ -93,7 +95,7 @@ class Game
     if word.eql?(@secret_word)
       @correct = word.split("")
     else
-      puts "\n #{word} is the incorrect word unfortunately"
+      puts "    \n #{word} is the incorrect word unfortunately"
       @attempts_left -= 1
       @incorrect << word
     end
@@ -114,6 +116,7 @@ class Game
 
   def save_this_game?
     puts "Press 1 to Save Game"
+    spacer
   end
 
   def save_as?
@@ -139,15 +142,25 @@ class Game
 end
 
 def load_screen
+  print "------ HANGMAN ------\n"
   puts "Press [n] to start a new game"
   puts "Press [l] to load existing game"
+  
   choice = gets.chomp.downcase
-  if choice == "n"
+  while choice.match(/[^nl]/)
+    puts "na...select again."
+    choice = gets.chomp.downcase
+  end
+  choice
+
+  if choice.match("n")
     spacer
     start_new_game
-  elsif choice == "l"
+  elsif choice.match("l")
     spacer
     where_you_left_off
+  else
+    puts "    Your selection needs to be either l or n. Try again." 
   end
 end
 
