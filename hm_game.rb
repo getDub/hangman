@@ -181,6 +181,10 @@ def saved_games
   games = Dir.children("saves").each_with_index {|f, i| puts "    #{i + 1}. #{f.gsub(".yaml", "")}"}
   puts "Type the number of the game file you would like to load."
   file_number = gets.chomp.to_i - 1
+  while file_number > games.length || file_number.between?(-1,0)
+    puts "Incorrect number. Please select from the numbers displayed to the left of the file"
+    file_number = gets.chomp.to_i
+  end
   puts "    saved game '#{games[file_number].gsub(".yaml", "")}' loading...." 
   spacer
   games[file_number] 
