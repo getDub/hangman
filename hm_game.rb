@@ -16,13 +16,14 @@ class Game
   def start_game
     load_dictionary
     intro if correct.empty? && incorrect.empty?
-    p @secret_word
+    # p @secret_word #enable when testing
     puts "Please see above game info of where you left off", game_info(@all_guesses.last) unless @all_guesses.empty?
     while @attempts_left > 0 
       game_info(guess)
       all_letters_revealed ? winner : save_this_game?
     end
     puts "\nYour out of turns. You loose." if @attempts_left == 0
+    puts "The secrect word was #{@secret_word}"
   end
 
   def load_dictionary
@@ -70,7 +71,7 @@ class Game
     @all_guesses << guess
 
     puts "    Your guess needs to be a letter not a number." if guess.to_i > 1
-    save_as? if guess == "1"
+    # save_as? if guess == "1"
 
     puts "    You've guessed this already" if guessed_already(guess)
 
@@ -79,6 +80,8 @@ class Game
     elsif @secret_word.include?(guess)
       puts "    #{guess} is correct"
       @correct << guess
+    elsif guess == "1"
+      save_as?
     else
       @attempts_left -= 1 
       puts "    #{guess} is incorrect"
@@ -90,7 +93,6 @@ class Game
     @correct.include?(players_guess) || @incorrect.include?(players_guess)
   end
 
-   
   def word_guess(word)
     if word.eql?(@secret_word)
       @correct = word.split("")
