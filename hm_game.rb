@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 require 'yaml'
-#hangman game
+# hangman game
 class Game
   attr_accessor :dictionary, :secret_word, :attempts_left, :all_guesses, :correct, :incorrect
 
@@ -17,7 +17,10 @@ class Game
   def start_game
     intro if correct.empty? && incorrect.empty?
     # p @secret_word #enable when testing
-    puts 'Please see above game info of where you left off', game_info(@all_guesses.last) unless @all_guesses.empty?
+    unless @all_guesses.empty?
+      print "    Please see above game info of where you left off.\nTake your next guess\n",
+            game_info
+    end
     while @attempts_left.positive?
       prompt_players_guess
       game_info
@@ -141,24 +144,29 @@ class Game
   def self.load_game(saved_games_file)
     game_file = File.open("saves/#{saved_games_file}")
     yaml = game_file.read
+    puts "#{saved_games_file} now loading...."
     YAML.safe_load(yaml, permitted_classes: [Game])
   end
 end
 
-def load_screen
+def splash_screen
   print "------ HANGMAN ------\n"
   puts 'Press [n] to start a new game'
   puts 'Press [l] to load existing game'
-  choice = gets.chomp.downcase
-  switch_to_selection(choice)
+  # choice = gets.chomp.downcase
+  switch_to_selection(player_input)
 end
 
-def error_handling(player_input)
-  while player_input.match(/[^nl]/)
-    puts 'Your selction must be either [n] or [l].'
-    choice = gets.chomp.downcase
+def player_input
+  gets.chomp.downcase
+end
+
+def error_handling(input)
+  until input.include?('n') || input.include?('l')
+    print "Your selection must be either [n] or [l].\n Try again>>  "
+    input = player_input
   end
-  choice
+  switch_to_selection(input)
 end
 
 def switch_to_selection(selection)
@@ -182,10 +190,6 @@ def start_new_game
   Game.new.start_game
 end
 
-def where_you_left_off
-  Game.load_game(saved_games).start_game
-end
-
 def saved_games
   puts 'Saved games:'
   games = Dir.children('saves').each_with_index { |f, i| puts "    #{i + 1}. #{f.gsub('.yaml', '')}" }
@@ -195,9 +199,14 @@ def saved_games
     puts 'Incorrect number. Please select from the numbers displayed to the left of the file'
     file_number = gets.chomp.to_i - 1
   end
-  puts "    saved game '#{games[file_number].gsub('.yaml', '')}' loading...."
+  puts "    you've selected '#{games[file_number].gsub('.yaml', '')}' to load."
   spacer
   games[file_number]
 end
 
-load_screen
+def where_you_left_off
+  Game.load_game(saved_games).start_game
+end
+
+def process_file_; end
+splash_screen
